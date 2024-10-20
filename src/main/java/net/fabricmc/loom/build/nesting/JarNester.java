@@ -51,8 +51,11 @@ public class JarNester {
 
 		Preconditions.checkArgument(FabricModJsonFactory.isModJar(modJar), "Cannot nest jars into none mod jar " + modJar.getName());
 
+		// Ensure deterministic ordering of entries in fabric.mod.json
+		Collection<File> sortedJars = jars.stream().sorted().toList();
+
 		try {
-			ZipUtils.add(modJar.toPath(), jars.stream().map(file -> {
+			ZipUtils.add(modJar.toPath(), sortedJars.stream().map(file -> {
 				try {
 					return new Pair<>("META-INF/jars/" + file.getName(), Files.readAllBytes(file.toPath()));
 				} catch (IOException e) {
@@ -67,7 +70,7 @@ public class JarNester {
 					nestedJars = new JsonArray();
 				}
 
-				for (File file : jars) {
+				for (File file : sortedJars) {
 					String nestedJarPath = "META-INF/jars/" + file.getName();
 					Preconditions.checkArgument(FabricModJsonFactory.isModJar(file), "Cannot nest none mod jar: " + file.getName());
 
