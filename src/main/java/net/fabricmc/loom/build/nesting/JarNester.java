@@ -28,6 +28,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -52,7 +53,7 @@ public class JarNester {
 		Preconditions.checkArgument(FabricModJsonFactory.isModJar(modJar), "Cannot nest jars into none mod jar " + modJar.getName());
 
 		// Ensure deterministic ordering of entries in fabric.mod.json
-		Collection<File> sortedJars = jars.stream().sorted().toList();
+		Collection<File> sortedJars = jars.stream().sorted(Comparator.comparing(File::getName)).toList();
 
 		try {
 			ZipUtils.add(modJar.toPath(), sortedJars.stream().map(file -> {
